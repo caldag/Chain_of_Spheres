@@ -1,4 +1,4 @@
-This zip file contains three folders:
+This repository contains three folders:
 
 - Force Calculation Only: This is the code used for the verification part in the paper. The code in this folder computes
 the acoustic radiation force for a helix in the standing wave field. It does not simulate the trajectories.
