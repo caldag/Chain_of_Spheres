@@ -1,0 +1,180 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This code calculates the acoustic radiation force for a helix made
+% of nylon in a standing field in water as described in:
+%
+% H. O. Caldag, S. Yesilyurt, Acoustic radiation forces on 
+% magnetically actuated helical swimmers, Physics of Fluids , 32, 
+% 092012, 2020. https://doi.org/10.1063/5.0020930
+%
+% The code generates one set of data files used to construct the left half
+% of Fig. 3 in the article. Currently, it is configured to evaluate the
+% acoustic radiation force values for different minor diameters (see Fig.
+% 3c). 
+%
+% To generate the left-hand side of Fig. 3 with all available data,
+% run arfcom_comp_all.m.
+%
+% Results from the finite-element simulations are carried out with
+% COMSOL Multiphysics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%% Initializations and acoustic energy density
+clearvars;
+comdata=load('w_nyl_helmirsw_lamb100um.txt');
+
+hel_com_arf=[comdata(:,2);]; % Acoustic radiation force (ARF) values from simulation data
+hel_mir_list=[comdata(:,1);]; % Helix minor radii tested in simulations
+
+for jj=1:length(hel_com_arf)
+    f=1e6;
+    % c=1962; %glycerol
+    c=1480; %water
+    lamb=c/f;
+    
+    k=2*pi/lamb;
+    %
+    % rholiq=1260; %glycerol
+    rholiq=1000; %water
+    
+    pamp=1e5;
+    A=pamp/(2*rholiq*2*pi*f);
+    %
+    Ea=1/2*rholiq*k^2*A^2;
+    
+    %% Geometric parameters of the helix, iteratively:
+    % clearvars;
+    hel_length=100e-6;
+    hel_mar=30e-6;hel_mir=hel_mir_list(jj);
+    hel_lamb=hel_length;
+    hel_length=hel_lamb;
+  
+    n_sph=3;
+    a=hel_mir;
+    mdist=100;
+    sphloopc=0;
+    
+    while mdist>2*a
+        sphloopc=sphloopc+1;
+        % Center coordinates of the helix in Comsol simulation model
+        hel_kw=2*pi/hel_lamb;
+        
+        hel_dz=hel_length/n_sph; %Sphere placement
+        hel_z=-hel_length+hel_length/(n_sph*2):hel_dz:-hel_length/(n_sph*2);
+        hel_x=hel_mar/hel_dz/hel_kw*(sin(hel_kw*(hel_z+hel_dz/2)) - sin(hel_kw*(hel_z-hel_dz/2)));
+        hel_y=-hel_mar/hel_dz/hel_kw*(cos(hel_kw*(hel_z+hel_dz/2)) - cos(hel_kw*(hel_z-hel_dz/2)));
+        
+        % % plot3(hel_z,hel_y,hel_x,'*-')
+        % clf;
+        % plot3(hel_z,hel_y,hel_x,'o-')
+        
+        for ii=1:length(hel_z)-1
+            dist(ii)=sqrt((hel_z(ii+1)-hel_z(ii))^2+(hel_y(ii+1)-hel_y(ii))^2+(hel_x(ii+1)-hel_x(ii))^2);
+        end
+        
+        mdist=mean(dist); %Sphere radius for calculation from small spheres
+        % a=a2/2;
+        distlist(sphloopc)=mdist/2;
+        n_sph=n_sph+1;
+        clear hel_z hel_y hel_x
+    end
+    
+    larger=find(distlist>a)
+    selectedind=length(larger);
+    % a=alist(selectedind)
+    n_sph=3+selectedind-1;
+    clear hel_z hel_y hel_x
+    
+    hel_dz=hel_length/n_sph; %Sphere placement
+    hel_z=-hel_length+hel_length/(n_sph*2):hel_dz:-hel_length/(n_sph*2);
+    hel_x=hel_mar/hel_dz/hel_kw*(sin(hel_kw*(hel_z+hel_dz/2)) - sin(hel_kw*(hel_z-hel_dz/2)));
+    hel_y=-hel_mar/hel_dz/hel_kw*(cos(hel_kw*(hel_z+hel_dz/2)) - cos(hel_kw*(hel_z-hel_dz/2)));
+    
+    spharrvol(jj)=length(hel_z)*4/3*pi*a^3;
+    % hel_vol(jj)=2*pi*hel_mar*pi*hel_mir^2;
+    hel_vol(jj)=pi*4*hel_mir^2*hel_length/(cos(atan(2*pi*hel_mar/hel_length)))/4;
+    volrat=hel_vol(jj)/spharrvol(jj);
+    a=a.*volrat^(1/3);
+    % clf;
+    % plot3(hel_z,hel_y,hel_x,'-o');
+    
+    %% Equivalent single sphere
+    
+    % % % % %     % clearvars;
+    % % % % %     N=1; %number of wavelengths
+    % % % % %     hel_mar=30e-6;
+    % % % % %     hel_mir=hel_mir_list(jj);
+    % % % % %     hel_lamb=100e-6; %Geometric parameters
+    % % % % %     hel_length=N*hel_lamb;
+    % % % % %     n_sph=1;
+    % % % % %
+    % % % % %     % Center coordinates of the helix in Comsol simulation model
+    % % % % %     hel_z=-hel_length+hel_length/(n_sph*2):hel_length/n_sph:-hel_length/(n_sph*2);
+    % % % % %     hel_y=hel_mar*cos(2*pi/(hel_lamb).*hel_z+pi/2);
+    % % % % %     hel_x=hel_mar*sin(2*pi/(hel_lamb).*hel_z+pi/2);
+    % % % % %
+    % % % % %     hel_vol(jj)=N*pi*4*hel_mir^2*hel_lamb/(cos(atan(2*pi*hel_mar/hel_lamb)))/4; %Helix volume
+    % % % % %     a=(hel_vol(jj)/(4/3*n_sph*pi))^(1/3); %Sphere radius
+    % % % % %     alist(jj)=a
+    % % % % %
+    % % % % % %     clf;
+    % % % % % %     plot3(hel_z,hel_y,hel_x,'o-') %Uncomment if you want to see sphere placement
+    
+    %% Force function and force evaluation
+    
+    Yst=hasegawa79_st_test(k*a);
+    
+    Fac=0;
+    
+    kk=0;
+    phi=0;
+    for phi=0:lamb/64:63*lamb/64
+        kk=kk+1;
+        for ii=1:length(hel_z)
+            Fac(ii,kk)=pi*a^2*Ea*Yst*sin(2*k*(hel_z(ii)+phi));
+        end
+    end
+    arf_sums=sum(Fac(:,1));
+    
+    % disp(sum(Fac));
+    % plot(arf_sums);
+    
+    hel_has_arf(jj)=arf_sums(1)
+    % hel_com_arf=-5.2343e-12;
+    % hel_com_arf(ii)=3.15e-9;
+    
+    
+    spharrsurf(jj)=length(hel_z)*(4*pi*a^2);
+    helsurf(jj)=pi*2*hel_mir*hel_length/(cos(atan(2*pi*hel_mar/hel_length)));
+    
+    
+    disp(strcat(['Force ratio (Analytic/COMSOL): ' num2str(hel_has_arf(jj)/hel_com_arf(jj))]));
+    % disp(strcat(['Volume ratio (Analytic/COMSOL): ' num2str(spharrvol(jj)/hel_vol(jj))]));
+    clearvars -except hel_has_arf n_sph_list hel_mir_list hel_com_arf jj spharrvol hel_vol
+end
+
+
+errv=(hel_has_arf-hel_com_arf')./hel_com_arf';
+
+subplot(211)
+plot(2*hel_mir_list*10^6,hel_com_arf,'o-','LineWidth',2);
+hold on;
+plot(2*hel_mir_list*10^6,hel_has_arf,'o-','LineWidth',2);grid on; axis tight;
+legend('Comsol Simulation','Chain of Spheres');
+set(gca,'FontSize',13)
+
+subplot(212)
+plot(2*hel_mir_list*10^6,errv*100,'o-','LineWidth',2);grid on; axis tight;
+xlabel('$d [\mu m]$');ylabel('Relative Error [\%]');set(gca,'FontSize',13)
+set(gca,'FontSize',13)
+set(gcf,'Position',[463 153 572 777])
+
+
+
+% plot(hel_mir_list,errv*100,'o-','LineWidth',2);grid on; axis tight;
+% xlabel('d');ylabel('Relative Error [%]');set(gca,'FontSize',13)
+% title('Error in F^r^a^d, D=30e-6, \lambda=100e-6, N=1')
+

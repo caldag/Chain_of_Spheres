@@ -1,0 +1,14 @@
+% Model:              helix_arf_verified_ni_paramsw.mph
+% Version:            COMSOL 5.5.0.359
+% Date:               Jun 4 2020, 21:22
+% Table:              helmar_sw - Surface Integration 1
+% hel_mar                                         (((1/(2*rholiq*c0^2)*acpr.p_t*conj(acpr.p_t)/2-1/2*rholiq*(acpr.vx*conj(acpr.vx)+acpr.vy*conj(acpr.vy)+acpr.vz*conj(acpr.vz))/2)*acpr.nz+rholiq*real((acpr.nx*acpr.vx+acpr.ny*acpr.vy+acpr.nz*acpr.vz)*conj(acpr.vz))/2)) (N)
+2.0E-5                                            -5.583090974069565E-11
+3.0000000000000004E-5                             -7.809483533331656E-11
+4.0E-5                                            -1.018628092404365E-10
+5.000000000000001E-5                              -1.2506170155838677E-10
+6.000000000000001E-5                              -1.491277630190499E-10
+7.000000000000001E-5                              -1.73895502483613E-10
+8.0E-5                                            -1.9838439842561626E-10
+9.0E-5                                            -2.2260328836387155E-10
+1.0E-4                                            -2.4736516057268313E-10

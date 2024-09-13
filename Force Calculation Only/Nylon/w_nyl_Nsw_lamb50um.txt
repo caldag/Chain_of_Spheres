@@ -1,0 +1,9 @@
+% Model:              helix_arf_verified_ny_paramsw.mph
+% Version:            COMSOL 5.5.0.359
+% Date:               Jun 29 2020, 12:10
+% Table:              Table 5 - Surface Integration 1
+% N                      (((1/(2*rholiq*c0^2)*acpr.p_t*conj(acpr.p_t)/2-1/2*rholiq*(acpr.vx*conj(acpr.vx)+acpr.vy*conj(acpr.vy)+acpr.vz*conj(acpr.vz))/2)*acpr.nz+rholiq*real((acpr.nx*acpr.vx+acpr.ny*acpr.vy+acpr.nz*acpr.vz)*conj(acpr.vz))/2)) (N)
+1                        -1.1372266387224607E-11
+2                        -4.342358579808656E-11
+3                        -9.040244786649871E-11
+4                        -1.4406676154343275E-10
