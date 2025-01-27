@@ -14,8 +14,8 @@ the acoustic radiation force for a helix in the standing wave field. It does not
 
 - Travelling Wave Simulation: The code in this folder simulates a magnetically actuated helical swimmer in a travelling wave field over time in bulk swimming conditions. Main code of interest is traj_helix_travellingwave.m
 
-The codes themselves have many comments, check them out. Also check our paper covering this study (info below).
+The codes themselves have many comments, check them out. Also check our paper covering this study (link above).
 
 If you have any questions, write to hakanosmanc@gmail.com
 
-Also if you use this methodology, don't forget to cite our study.
+If you use this methodology, don't forget to cite our study.
